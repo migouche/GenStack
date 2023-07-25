@@ -7,9 +7,7 @@
 
 #include <string>
 #include <functional>
-
-class Stack;
-
+#include "Stack.h"
 
 class Value
 {
@@ -49,7 +47,7 @@ private:
     std::string data;
 };
 
-class OperationValue: public Value
+class OperationValue: public Value // this is more like "primitive" functions
 {
 public:
     explicit OperationValue(std::function<void(Stack *)> op);
@@ -62,6 +60,22 @@ public:
 private:
     //void (*op)(Stack*);
     std::function<void(Stack*)> op;
+};
+
+class FunctionValue: public Value
+{
+private:
+    Stack stack;
+public:
+    explicit FunctionValue(const std::list<std::shared_ptr<Value>>& values, bool reverse_order);
+
+
+    std::string to_string() const override;
+    std::string print_string() const override;
+
+    Stack get() const;
+
+    void eval(Stack* s);
 };
 
 #endif //GENSTACK_VALUE_H

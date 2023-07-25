@@ -57,3 +57,15 @@ std::function<void(Stack*)> Operations::get_operation(const std::string& name)
     return operations.at(name);
 }
 
+/*
+
+ 3
+ [
+ $1
+ $2
+ $3
+ ]
+ '+
+ '+
+ */
+

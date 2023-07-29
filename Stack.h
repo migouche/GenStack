@@ -20,8 +20,13 @@ private:
 public:
     Stack();
 
+    void clear();
+
     void push (const std::shared_ptr<Value>& v);
     std::shared_ptr<Value> pop();
+    std::shared_ptr<Value> peek(); // for testing purposes
+
+    Stack copy() const;
 
     void print() const;
 

@@ -1,6 +1,8 @@
-#include <testudo_lc> // default lower-case style
+#include <testudo/testudo_lc> // default lower-case style
 #include "Value.h"
 #include "Stack.h"
+#include "Operations.h"
+#include "Variables.h"
 
 define_top_test_node("pile", // parent full name
                      (stack, // test name
@@ -37,5 +39,4 @@ define_test(stack, // parent
   declare(Stack stack);
   check_try(stack.pop())_catch();
 }
-
 

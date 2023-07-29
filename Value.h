@@ -8,6 +8,7 @@
 #include <string>
 #include <functional>
 #include "Stack.h"
+#include "memory"
 
 class Value
 {
@@ -15,6 +16,7 @@ public:
     //virtual void pushToStack(Stack*) = 0;
     virtual std::string to_string() const = 0;
     virtual std::string print_string() const = 0;
+
     virtual ~Value() = default;
 };
 
@@ -67,15 +69,21 @@ class FunctionValue: public Value
 private:
     Stack stack;
 public:
-    explicit FunctionValue(const std::list<std::shared_ptr<Value>>& values, bool reverse_order);
-
+    FunctionValue(const std::list<std::shared_ptr<Value>>& values, bool reverse_order);
+    explicit FunctionValue(const Stack& stack); // copy constructor
+    explicit FunctionValue(std::function<void(Stack*)> op); // this is to cast an operation to a function
 
     std::string to_string() const override;
     std::string print_string() const override;
 
     Stack get() const;
 
-    void eval(Stack* s);
+    void eval(Stack* s); // will just "unpack onto stack and evaluate"
 };
 
+template <typename T>
+bool is_value_of_type(const std::shared_ptr<Value>& v)
+{
+    return std::dynamic_pointer_cast<T>(v) != nullptr;
+}
 #endif //GENSTACK_VALUE_H

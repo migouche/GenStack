@@ -61,9 +61,19 @@ void store(Stack *s)
 
 void loop(Stack *s)
 {
-    auto [n, op] = s->get<IntValue, FunctionValue>();
+    auto [n, op] = s->get<IntValue, Value>();
+    if(!is_value_of_type<OperationValue>(op) && !is_value_of_type<FunctionValue>(op))
+        throw std::runtime_error("Cannot loop on " + op->to_string());
+
+
+
     for(int i = 0; i < n->get(); i++)
-        op->eval(s);
+    {
+        if(is_value_of_type<OperationValue>(op))
+            std::dynamic_pointer_cast<OperationValue>(op)->eval(s);
+        else if (is_value_of_type<FunctionValue>(op))
+            std::dynamic_pointer_cast<FunctionValue>(op)->eval(s);
+    }
 }
 
 std::map<std::string, std::function<void(Stack*)>> Operations::operations = {

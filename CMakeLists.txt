@@ -8,4 +8,6 @@ include_directories(~/local/include) # this line may give errorsg
 
 add_executable(genstack main.cpp Value.h Operations.h Operations.cpp Stack.h Stack.cpp Value.cpp
         Variables.cpp
-        Variables.h)
+        Variables.h
+        Parser.cpp
+        Parser.h)

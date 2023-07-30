@@ -69,16 +69,15 @@ class FunctionValue: public Value
 private:
     Stack stack;
 public:
-    FunctionValue(const std::list<std::shared_ptr<Value>>& values, bool reverse_order);
     explicit FunctionValue(const Stack& stack); // copy constructor
-    explicit FunctionValue(std::function<void(Stack*)> op); // this is to cast an operation to a function
+    explicit FunctionValue(std::function<void(Stack*)> op);
 
     std::string to_string() const override;
     std::string print_string() const override;
 
     Stack get() const;
 
-    void eval(Stack* s); // will just "unpack onto stack and evaluate"
+    void eval(Stack* s) const; // will just "unpack onto stack and evaluate"
 };
 
 template <typename T>

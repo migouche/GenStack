@@ -31,16 +31,6 @@ std::string OperationValue::print_string() const { return this->to_string(); }
 void OperationValue::eval(Stack *s) const { this->op(s); }
 
 
-FunctionValue::FunctionValue(const std::list<std::shared_ptr<Value>> &values, bool reverse_order)
-{
-    if (reverse_order)
-        for (auto it = values.rbegin(); it != values.rend(); it++) // cant do range in reverse
-            stack.push(*it);
-    else
-        for (const auto & value : values)
-            stack.push(value);
-}
-
 FunctionValue::FunctionValue(const Stack &stack) {
     this->stack = stack.copy();
 }
@@ -55,11 +45,13 @@ std::string FunctionValue::print_string() const { return "function"; }
 
 Stack FunctionValue::get() const { return this->stack; }
 
-void FunctionValue::eval(Stack *s) {
+void FunctionValue::eval(Stack *s) const {
     auto f = this->get();
     while (f.length() > 0) {
         auto v = f.pop();
-        if(is_value_of_type<OperationValue>(v))
+        if(is_value_of_type<FunctionValue>(v))
+            std::dynamic_pointer_cast<FunctionValue>(v)->eval(s);
+        else if (is_value_of_type<OperationValue>(v))
             std::dynamic_pointer_cast<OperationValue>(v)->eval(s);
         else
             s->push(v);

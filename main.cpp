@@ -28,10 +28,10 @@ int main() {
             (in_function ? function_stack: stack).push(make_shared<IntValue>(strtol(s.c_str(), nullptr, 10)));
         else if (s[0] == '\'') {
             s.erase(s.begin());
-            if (in_function)
-                function_stack.push(make_shared<OperationValue>([s](Stack* st){st->push(make_shared<OperationValue>(Operations::get_operation(s))); }));
+            if(Variables::exists(s))
+                Variables::push_variable_no_eval(s, &(in_function ? function_stack: stack));
             else
-                stack.push(make_shared<FunctionValue>(Operations::get_operation(s))); // to be able to loop and stuff through not evaluated operatoins
+                (in_function ? function_stack: stack).push(make_shared<OperationValue>(Operations::get_operation(s)));
         }
         else if (s[0] == '\"')
         {
@@ -59,15 +59,11 @@ int main() {
             else
             {
                 if (in_function)
-                {
-                    function_stack.push(make_shared<OperationValue>([s](Stack* st){Operations::get_operation(s)(st); }));
-                } else
-                    Operations::get_operation(s)(&stack);
+                    function_stack.push(make_shared<OperationValue>(Operations::get_operation(s)));
+                else
+                     Operations::get_operation(s)(&stack);
             }
         }
-
-
-        //std::cout << "is int?: " << is_value_of_type<IntValue>(stack.peek()) << "\n";
         std::cout << "\n\n\n";
         stack.print();
     }

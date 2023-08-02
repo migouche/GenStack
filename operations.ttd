@@ -74,6 +74,7 @@ define_test(operations,
     check(stack.length())_equal(0);
 }
 
+
 define_test(operations,
             "storing and retrieving functions")
 {
@@ -87,7 +88,7 @@ define_test(operations,
             "storing and retrieving and evaluating functions")
 {
     declare(Stack stack);
-    perform(stack = Parser::parse("[ 5 '+ ] \"func2 store 4 func2 eval"));
+    perform(stack = Parser::parse("[ 5 '+ ] \"func store 4 func eval"));
     check(stack.pop()->as<IntValue>()->get())_equal(9);
     check(stack.length())_equal(0);
 }
@@ -105,7 +106,7 @@ define_test(operations,
             "evaluating a function in a variable")
 {
     declare(Stack stack);
-    perform(stack = Parser::parse("[ 3 '+ ] \"func3 store 7 'func3 eval eval"));
+    perform(stack = Parser::parse("[ 3 '+ ] \"func store 7 'func eval eval"));
     check(stack.pop()->as<IntValue>()->get())_equal(10);
     check(stack.length())_equal(0);
 }

@@ -54,6 +54,8 @@ Stack Parser::parse(std::istream &input, bool print) {
         else if (s[0] == '\"')
         {
             s.erase(s.begin());
+            if(s[s.length() - 1] == '\"')
+                s.erase(s.end() - 1);
             (in_function ? function_stack: stack).push(std::make_shared<StringValue>(s));
         }
         else if (s == "[")

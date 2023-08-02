@@ -19,9 +19,11 @@ std::shared_ptr<Value> Variables::get_variable(const std::string &name) {
 }
 
 void Variables::set_variable(const std::string &name, const std::shared_ptr<Value> &value) {
-    if (variables.find(name) != variables.end())
-        throw std::runtime_error("Variable " + name + " already exists"); // for now they constants
-    variables.insert({name, value});
+    auto it = variables.find(name);
+    if (it != variables.end())
+        it->second = value;
+    else
+        variables.insert({name, value});
 }
 
 void Variables::push_variable(const std::string &name, Stack *s) {

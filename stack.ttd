@@ -38,3 +38,13 @@ define_test(stack, // parent
   declare(Stack stack);
   check_try(stack.pop())_catch();
 }
+
+define_test(stack,
+            "pushing strings")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("\"hey \"ho\""));
+    check(stack.pop()->as<StringValue>()->get())_equal("ho");
+    check(stack.pop()->as<StringValue>()->get())_equal("hey");
+    check(stack.length())_equal(0);
+}

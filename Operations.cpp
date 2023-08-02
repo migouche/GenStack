@@ -3,6 +3,7 @@
 //
 
 #include <stdexcept>
+#include <iostream>
 #include "Operations.h"
 #include "Stack.h"
 #include "Value.h"

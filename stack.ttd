@@ -28,8 +28,8 @@ define_test(stack, // parent
   declare(Stack stack);
   perform(stack.push(make_shared<IntValue>(33)));
   perform(stack.push(make_shared<StringValue>("hey")));
-  check(dynamic_pointer_cast<StringValue>(stack.pop())->get())_equal("hey");
-  check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(33);
+  check(stack.pop()->as<StringValue>()->get())_equal("hey");
+  check(stack.pop()->as<IntValue>()->get())_equal(33);
 }
 
 define_test(stack, // parent
@@ -37,75 +37,4 @@ define_test(stack, // parent
   declare(using namespace std);
   declare(Stack stack);
   check_try(stack.pop())_catch();
-}
-
-
-define_test(stack,
-            "storing and retrieving a variable")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("4 \"var store var"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(4);
-    check(stack.length())_equal(0);
-}
-
-define_test(stack,
-            "storing and retrieving functions")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("[ 5 + ] \"func store 4 func"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(9);
-    check(stack.length())_equal(0);
-}
-
-define_test(stack,
-            "storing and retrieving and evaluating functions")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("[ 5 '+ ] \"func2 store 4 func2 eval"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(9);
-    check(stack.length())_equal(0);
-}
-
-define_test(stack,
-         "evaluating a function")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("7 [ 3 '+ ] eval eval"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(10);
-    check(stack.length())_equal(0);
-}
-
-define_test(stack,
-            "evaluating a function in a variable")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("[ 3 '+ ] \"func3 store 7 'func3 eval eval"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(10);
-    check(stack.length())_equal(0);
-}
-
-define_test(stack,
-            "looping a function")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("1 [ 10 * 1 + ] 3 for"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(1111);
-    check(stack.length())_equal(0);
-}
-
-define_test(stack,
-            "looping a 'primitive' operation")
-{
-    declare(using namespace std);
-    declare(Stack stack);
-    perform(stack = Parser::parse("1 10 1 0 '+ 3 for"));
-    check(dynamic_pointer_cast<IntValue>(stack.pop())->get())_equal(12);
-    check(stack.length())_equal(0);
 }

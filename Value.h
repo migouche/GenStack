@@ -10,12 +10,21 @@
 #include "Stack.h"
 #include "memory"
 
-class Value
+class Value : public std::enable_shared_from_this<Value>
 {
 public:
     //virtual void pushToStack(Stack*) = 0;
     virtual std::string to_string() const = 0;
     virtual std::string print_string() const = 0;
+
+    template <class T>
+    std::shared_ptr<T> as()
+    {
+        auto p = std::dynamic_pointer_cast<T>(this->shared_from_this());
+        if(p == nullptr)
+            throw std::runtime_error("couldn't cast Value to type");
+        return p;
+    }
 
     virtual ~Value() = default;
 };

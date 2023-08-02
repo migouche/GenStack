@@ -26,7 +26,7 @@ Stack Parser::parse(std::istream &input, bool print) {
                      "Start with ' to push an operation\n"
                      "Write an operation to execute it\n\n\n";
 
-
+    // make input not use '-' as a delimiter
     while (input >> s)
     {
         if(s == "exit" || s == "quit")
@@ -36,7 +36,7 @@ Stack Parser::parse(std::istream &input, bool print) {
             return stack;
         }
 
-        if(isdigit(s[0]) || s[0] == '-')
+        if(isdigit(s[0]) || (s[0] == '-' && s.length() > 1))
             (in_function ? function_stack: stack).push(std::make_shared<IntValue>(strtol(s.c_str(), nullptr, 10)));
         else if (s[0] == '\'') {
             s.erase(s.begin());

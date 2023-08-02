@@ -1,0 +1,129 @@
+#include <testudo/testudo_lc> // default lower-case style
+#include "Value.h"
+#include "Stack.h"
+#include "Parser.h"
+
+define_top_test_node("operations",
+                     (operations,
+                     "operations tests"));
+
+define_test(operations,
+            "adding")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("4 5 +"));
+    check(stack.pop()->as<IntValue>()->get())_equal(9);
+    check(stack.length())_equal(0);
+}
+
+
+define_test(operations,
+            "subtracting")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("5 4 - 4 5 -"));
+    check(stack.pop()->as<IntValue>()->get())_equal(-1);
+    check(stack.pop()->as<IntValue>()->get())_equal(1);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "multiplying")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("5 -4 *"));
+    check(stack.pop()->as<IntValue>()->get())_equal(-20);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "swapping")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("\"hey 4 swap '+ swap"));
+    check(stack.pop()->as<StringValue>()->get())_equal("hey");
+    check(is_value_of_type<OperationValue>(stack.pop()))_true;
+    check(stack.pop()->as<IntValue>()->get())_equal(4);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "popping")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("4 5 6 pop pop"));
+    check(stack.pop()->as<IntValue>()->get())_equal(4);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "concatenating")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("\"123 \"456 cat"));
+    check(stack.pop()->as<StringValue>()->get())_equal("123456");
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "storing and retrieving a variable")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("4 \"var store var"));
+    check(stack.pop()->as<IntValue>()->get())_equal(4);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "storing and retrieving functions")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("[ 5 + ] \"func store 4 func"));
+    check(stack.pop()->as<IntValue>()->get())_equal(9);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "storing and retrieving and evaluating functions")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("[ 5 '+ ] \"func2 store 4 func2 eval"));
+    check(stack.pop()->as<IntValue>()->get())_equal(9);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "evaluating a function")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("7 [ 3 '+ ] eval eval"));
+    check(stack.pop()->as<IntValue>()->get())_equal(10);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "evaluating a function in a variable")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("[ 3 '+ ] \"func3 store 7 'func3 eval eval"));
+    check(stack.pop()->as<IntValue>()->get())_equal(10);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "looping a function")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("1 [ 10 * 1 + ] 3 for"));
+    check(stack.pop()->as<IntValue>()->get())_equal(1111);
+    check(stack.length())_equal(0);
+}
+
+define_test(operations,
+            "looping a 'primitive' operation")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("1 10 1 0 '+ 3 for"));
+    check(stack.pop()->as<IntValue>()->get())_equal(12);
+    check(stack.length())_equal(0);
+}

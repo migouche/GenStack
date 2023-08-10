@@ -5,6 +5,10 @@
 #include "Value.h"
 #include "Stack.h"
 
+void Value::eval(Stack *s) const {
+    s->push(std::const_pointer_cast<Value>(this->shared_from_this()));
+}
+
 IntValue::IntValue(int i): data(i) {}
 
 std::string IntValue::to_string() const { return  std::to_string(data); }
@@ -35,7 +39,7 @@ FunctionValue::FunctionValue(const Stack &stack) {
     this->stack = stack.copy();
 }
 
-FunctionValue::FunctionValue(std::function<void(Stack *)> op) {
+FunctionValue::FunctionValue(const std::function<void(Stack *)>& op) {
     this->stack = Stack();
     this->stack.push(std::make_shared<OperationValue>([op](Stack* s){op(s); }));
 }
@@ -47,13 +51,9 @@ Stack FunctionValue::get() const { return this->stack; }
 
 void FunctionValue::eval(Stack *s) const {
     auto f = this->get();
-    while (f.length() > 0) {
+    while (f.length() > 0)
+    {
         auto v = f.pop();
-        if(is_value_of_type<FunctionValue>(v))
-            std::dynamic_pointer_cast<FunctionValue>(v)->eval(s);
-        else if (is_value_of_type<OperationValue>(v))
-            std::dynamic_pointer_cast<OperationValue>(v)->eval(s);
-        else
-            s->push(v);
+        v->eval(s);
     }
 }

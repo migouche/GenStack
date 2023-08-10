@@ -3,11 +3,9 @@
 //
 
 #include <stdexcept>
-#include <iostream>
 #include "Operations.h"
 #include "Stack.h"
 #include "Value.h"
-#include "Operations.h"
 #include "Variables.h"
 
 void int_add(Stack *s) {

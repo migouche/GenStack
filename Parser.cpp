@@ -26,7 +26,6 @@ Stack Parser::parse(std::istream &input, bool print) {
                      "Start with ' to push an operation\n"
                      "Write an operation to execute it\n\n\n";
 
-    // make input not use '-' as a delimiter
     while (input >> s)
     {
         if(s == "exit" || s == "quit")

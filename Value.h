@@ -16,6 +16,7 @@ public:
     //virtual void pushToStack(Stack*) = 0;
     virtual std::string to_string() const = 0;
     virtual std::string print_string() const = 0;
+    virtual void eval(Stack* s) const;
 
     template <class T>
     std::shared_ptr<T> as()
@@ -38,6 +39,7 @@ public:
     std::string to_string() const override;
     std::string print_string() const override;
 
+
     int get() const;
 
 private:
@@ -54,6 +56,8 @@ public:
 
     std::string get() const;
 
+
+
 private:
     std::string data;
 };
@@ -66,7 +70,7 @@ public:
     std::string to_string() const override;
     std::string print_string() const override;
 
-    void eval(Stack* s) const;
+    void eval(Stack* s) const override;
 
 private:
     //void (*op)(Stack*);
@@ -79,14 +83,14 @@ private:
     Stack stack;
 public:
     explicit FunctionValue(const Stack& stack); // copy constructor
-    explicit FunctionValue(std::function<void(Stack*)> op);
+    explicit FunctionValue(const std::function<void(Stack*)>& op);
 
     std::string to_string() const override;
     std::string print_string() const override;
 
     Stack get() const;
 
-    void eval(Stack* s) const; // will just "unpack onto stack and evaluate"
+    void eval(Stack* s) const override;
 };
 
 template <typename T>

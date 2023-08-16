@@ -17,6 +17,7 @@ private:
     static std::map<std::string, std::function<void(Stack*)>> operations;
 public:
     static std::function<void(Stack*)> get_operation(const std::string& name);
+    static bool operation_exists(const std::string& name);
 };
 
 #endif //GENSTACK_OPERATIONS_H

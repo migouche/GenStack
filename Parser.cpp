@@ -14,6 +14,7 @@
 #include <sstream>
 
 Stack Parser::parse(std::istream &input, bool print) {
+
     bool in_function = false;
     Stack stack = Stack();
     Stack function_stack = Stack();
@@ -50,10 +51,10 @@ Stack Parser::parse(std::istream &input, bool print) {
                 else
                     stack.push(std::make_shared<OperationValue>(Operations::get_operation(s)));
         }
-        else if (s[0] == '\"')
+        else if (s[0] == '"')
         {
             s.erase(s.begin());
-            if(s[s.length() - 1] == '\"')
+            if(s[s.length() - 1] == '"')
                 s.erase(s.end() - 1);
             (in_function ? function_stack: stack).push(std::make_shared<StringValue>(s));
         }
@@ -95,9 +96,79 @@ Stack Parser::parse(std::istream &input, bool print) {
 Stack Parser::parse(const std::string &input)
 {
     std::stringstream iss(input);
-    return parse(iss, false);
+    ParserStream stream(iss);
+    Stack stack;
+    new_parse(stream, &stack);
+    return stack;
 }
 
-/*std::shared_ptr<Value> Parser::parse_block(std::istream &input, std::string token) {
 
-}*/
+Stack Parser::interactive_parse()
+{ //REPL
+    Stack stack;
+    while(true) {
+        std::string line;
+        std::getline(std::cin, line);
+        // std::cout << "line: " << line << std::endl;
+        std::istringstream iss(line);
+        ParserStream stream(iss);
+        new_parse(stream, &stack);
+        std::cout << "\n\n\n\n\n\n\n\n\n";
+        stack.print();
+    }
+
+}
+
+
+void Parser::new_parse(ParserStream &input, Stack* stack) {
+    while(!input.is_end_of_stream() && input.peek_token() != "exit")
+    {
+        if(Operations::operation_exists(input.peek_token()))
+            Operations::get_operation(input.get_token())(stack);
+        else if (Variables::exists(input.peek_token()))
+            Variables::push_variable(input.get_token(), stack);
+        else
+            stack->push(parse_block(input));
+    }
+}
+
+std::shared_ptr<Value> Parser::parse_block(ParserStream &input) {
+    std::string token = input.get_token();
+    //std::cout << "Parsing token: " << token << std::endl;
+
+    if(isdigit(token[0]) || (token[0] == '-' && token.length() > 1))
+        return std::make_shared<IntValue>(strtol(token.c_str(), nullptr, 10));
+    else if (token[0] == '"')
+    {
+        token.erase(token.begin());
+        if(token[token.length() - 1] == '\"')
+            token.erase(token.end() - 1);
+        // std::cout << "going back" << std::endl;
+        return std::make_shared<StringValue>(token);
+    }
+    else if(token[0] == '\'') // can be cleaner if I manage to implement input.get_char() and input.peek_char()
+    {
+        token.erase(token.begin());
+        if(Operations::operation_exists(token))
+            return std::make_shared<OperationValue>([token](Stack* s){
+                s->push(std::make_shared<FunctionValue>(Operations::get_operation(token)));
+            });
+        else if(Variables::exists(token))
+            return Variables::get_variable(token); //NOTE: evaluating and not evaluating an Int will do the same
+    }
+    else if (Variables::exists(token))
+        return Variables::get_variable(token);
+    else if(Operations::operation_exists(token))
+        return std::make_shared<OperationValue>(Operations::get_operation(token));
+    else if (token == "[")
+    {
+        Stack s;
+        while(input.peek_token() != "]")
+            s.push(parse_block(input));
+        input.get_token();
+        return std::make_shared<FunctionValue>(s);
+    }
+    else if (token == "]")
+        throw std::runtime_error("No function to end");
+    throw std::runtime_error("Couldn't parse this :(");
+}

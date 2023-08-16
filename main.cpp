@@ -7,8 +7,7 @@
 using namespace std;
 
 int main() {
-
-    Stack s = Parser::parse(cin);
+    Stack s = Parser::interactive_parse();
     std::cout << "Last element is: " << s.peek()->print_string() << std::endl;
 
     return 0;

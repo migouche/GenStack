@@ -29,14 +29,7 @@ void Variables::set_variable(const std::string &name, const std::shared_ptr<Valu
 void Variables::push_variable(const std::string &name, Stack *s) {
     if (variables.find(name) == variables.end())
         throw std::runtime_error("Variable " + name + " not found");
-    auto var = variables.at(name);
-    if (is_value_of_type<FunctionValue>(var))
-    {
-        auto func = std::dynamic_pointer_cast<FunctionValue>(var);
-        func->eval(s);
-    }
-    else
-        s->push(var);
+    variables.at(name)->eval(s);
 }
 
 void Variables::push_variable_no_eval(const std::string &name, Stack *s) {

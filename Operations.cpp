@@ -72,6 +72,9 @@ void loop(Stack *s)
             std::dynamic_pointer_cast<OperationValue>(op)->eval(s);
         else if (is_value_of_type<FunctionValue>(op))
             std::dynamic_pointer_cast<FunctionValue>(op)->eval(s);
+        else
+            throw std::runtime_error("Cannot eval " + op->to_string() + "to operation or function");
+        s->pop()->eval(s);
     }
 }
 
@@ -89,9 +92,13 @@ std::map<std::string, std::function<void(Stack*)>> Operations::operations = {
 
 std::function<void(Stack*)> Operations::get_operation(const std::string& name)
 {
-    if(operations.find(name) == operations.end())
+    if(!operation_exists(name))
         throw std::runtime_error("Operation " + name + " does not exist!");
     return operations.at(name);
+}
+
+bool Operations::operation_exists(const std::string &name) {
+    return operations.find(name) != operations.end();
 }
 
 /*

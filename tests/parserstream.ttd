@@ -14,8 +14,6 @@ define_test(parse_stream,
     declare(istringstream iss("hey ho"));
     declare(ParserStream stream(iss));
 
-    declare(string str);
-
     check(stream.is_end_of_stream())_false;
     check(stream.peek_token())_equal("hey");
     check(stream.is_end_of_stream())_false;
@@ -33,7 +31,6 @@ define_test(parse_stream,
     declare(using namespace std);
     declare(istringstream iss(""));
     declare(ParserStream stream(iss));
-    declare(string str);
 
     check(stream.is_end_of_stream())_true;
 }
@@ -45,8 +42,6 @@ define_test(parse_stream,
 
     declare(istringstream iss("hey"));
     declare(ParserStream stream(iss));
-
-    declare(string str);
 
     check(stream.is_end_of_stream())_false;
     check(stream.peek_token())_equal("hey");

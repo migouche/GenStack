@@ -6,7 +6,6 @@
 #define GENSTACK_PARSERSTREAM_H
 
 #include <istream>
-#include <memory>
 
 class ParserStream
 {

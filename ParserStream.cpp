@@ -2,9 +2,6 @@
 // Created by migouche on 14/08/23.
 //
 
-#include <list>
-#include <sstream>
-
 #include "ParserStream.h"
 
 ParserStream::ParserStream(std::istream &stream): stream(stream)

@@ -97,3 +97,7 @@ Stack Parser::parse(const std::string &input)
     std::stringstream iss(input);
     return parse(iss, false);
 }
+
+/*std::shared_ptr<Value> Parser::parse_block(std::istream &input, std::string token) {
+
+}*/

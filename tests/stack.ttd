@@ -1,7 +1,7 @@
 #include <testudo/testudo_lc> // default lower-case style
-#include "Value.h"
-#include "Stack.h"
-#include "Parser.h"
+#include "../Value.h"
+#include "../Stack.h"
+#include "../Parser.h"
 
 define_top_test_node("pile", // parent full name
                      (stack, // test name

@@ -10,4 +10,6 @@ add_executable(genstack main.cpp Value.h Operations.h Operations.cpp Stack.h Sta
         Variables.cpp
         Variables.h
         Parser.cpp
-        Parser.h)
+        Parser.h
+        ParserStream.cpp
+        ParserStream.h)

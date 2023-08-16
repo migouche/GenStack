@@ -1,0 +1,56 @@
+#include "testudo/testudo_lc" // default lower-case style
+#include "../ParserStream.h"
+#include <sstream>
+
+define_top_test_node("parse_stream",
+                     (parse_stream,
+                      "parse_stream tests"));
+
+define_test(parse_stream,
+            "peeking and getting strings")
+{
+    declare(using namespace std);
+
+    declare(istringstream iss("hey ho"));
+    declare(ParserStream stream(iss));
+
+    declare(string str);
+
+    check(stream.is_end_of_stream())_false;
+    check(stream.peek_token())_equal("hey");
+    check(stream.is_end_of_stream())_false;
+    check(stream.get_token())_equal("hey");
+    check(stream.is_end_of_stream())_false;
+    check(stream.peek_token())_equal("ho");
+    check(stream.is_end_of_stream())_false;
+    check(stream.get_token())_equal("ho");
+    check(stream.is_end_of_stream())_true;
+}
+
+define_test(parse_stream,
+            "empty stream")
+{
+    declare(using namespace std);
+    declare(istringstream iss(""));
+    declare(ParserStream stream(iss));
+    declare(string str);
+
+    check(stream.is_end_of_stream())_true;
+}
+
+define_test(parse_stream,
+            "stream with 1 element")
+{
+    declare(using namespace std);
+
+    declare(istringstream iss("hey"));
+    declare(ParserStream stream(iss));
+
+    declare(string str);
+
+    check(stream.is_end_of_stream())_false;
+    check(stream.peek_token())_equal("hey");
+    check(stream.is_end_of_stream())_false;
+    check(stream.get_token())_equal("hey");
+    check(stream.is_end_of_stream())_true;
+}

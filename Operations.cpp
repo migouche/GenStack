@@ -68,12 +68,9 @@ void loop(Stack *s)
 
     for(int i = 0; i < n->get(); i++)
     {
-        if(is_value_of_type<OperationValue>(op))
-            std::dynamic_pointer_cast<OperationValue>(op)->eval(s);
-        else if (is_value_of_type<FunctionValue>(op))
-            std::dynamic_pointer_cast<FunctionValue>(op)->eval(s);
-        else
+        if(!is_value_of_type<OperationValue>(op) && !is_value_of_type<FunctionValue>(op))
             throw std::runtime_error("Cannot eval " + op->to_string() + "to operation or function");
+        op->eval(s);
         s->pop()->eval(s);
     }
 }

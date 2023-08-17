@@ -3,8 +3,8 @@
 //
 
 #include "Stack.h"
-#include "Value.h"
 #include <iostream>
+#include "Value.h"
 
 
 Stack::Stack(): data(std::list<std::shared_ptr<Value>>()){}
@@ -29,10 +29,22 @@ std::shared_ptr<Value> Stack::peek() {
     return this->data.front();
 }
 
-Stack Stack::copy() const {
-    Stack s;
+void Stack::push_back(const std::shared_ptr<Value> &v) {
+    this->data.push_back(v);
+}
+
+std::shared_ptr<Value> Stack::pop_back() {
+    if(data.empty())
+        throw std::runtime_error("Stack is empty");
+    auto v = this->data.back();
+    this->data.pop_back();
+    return v;
+}
+
+std::shared_ptr<Stack> Stack::copy() const {
+    auto s = std::make_shared<Stack>();
     for (const auto & value : this->data)
-        s.push(value);
+        s->push_back(value);
     return s;
 }
 

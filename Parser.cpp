@@ -13,7 +13,7 @@
 #include <iostream>
 #include <sstream>
 
-Stack Parser::parse(std::istream &input, bool print) {
+/*Stack Parser::parse(std::istream &input, bool print) {
 
     bool in_function = false;
     Stack stack = Stack();
@@ -91,42 +91,56 @@ Stack Parser::parse(std::istream &input, bool print) {
     }
 
     return stack;
-}
+return Stack();
+}*/
 
 Stack Parser::parse(const std::string &input)
 {
     std::stringstream iss(input);
     ParserStream stream(iss);
-    Stack stack;
-    new_parse(stream, &stack);
-    return stack;
+    auto stack = std::make_shared<Stack>();
+    new_parse(stream, stack);
+    return *stack->copy();
 }
 
 
-Stack Parser::interactive_parse()
+Stack  Parser::interactive_parse()
 { //REPL
-    Stack stack;
+    auto stack = std::make_shared<Stack>();
     while(true) {
         std::string line;
         std::getline(std::cin, line);
         // std::cout << "line: " << line << std::endl;
         std::istringstream iss(line);
         ParserStream stream(iss);
-        new_parse(stream, &stack);
+        new_parse(stream, stack);
         std::cout << "\n\n\n\n\n\n\n\n\n";
-        stack.print();
+        stack->print();
     }
+    return *stack->copy();
 
 }
 
 
-void Parser::new_parse(ParserStream &input, Stack* stack) {
-    while(!input.is_end_of_stream() && input.peek_token() != "exit")
+void Parser::new_parse(ParserStream &input, const std::shared_ptr<Stack>& stack) {
+    while(!input.is_end_of_stream())
     {
         if(Operations::operation_exists(input.peek_token()))
             Operations::get_operation(input.get_token())(stack);
         else if (Variables::exists(input.peek_token()))
             Variables::push_variable(input.get_token(), stack);
+            //std::cout << "variable pushed\n";
+        else if(input.peek_token()[0] == '\'')
+        {
+            auto token = input.get_token();
+            token.erase(token.begin());
+            if (Operations::operation_exists(token))
+                stack->push(std::make_shared<OperationValue>(Operations::get_operation(token)));
+            else if (Variables::exists(token))
+                Variables::push_variable_no_eval(token, stack);
+            else
+                throw std::runtime_error("Unknown operation or variable: " + token);
+        }
         else
             stack->push(parse_block(input));
     }
@@ -150,8 +164,9 @@ std::shared_ptr<Value> Parser::parse_block(ParserStream &input) {
     {
         token.erase(token.begin());
         if(Operations::operation_exists(token))
-            return std::make_shared<OperationValue>([token](Stack* s){
-                s->push(std::make_shared<FunctionValue>(Operations::get_operation(token)));
+            return std::make_shared<OperationValue>([token](const std::shared_ptr<Stack>& s){
+                //std::cout << "pushing\n";
+                s->push(std::make_shared<OperationValue>(Operations::get_operation(token)));
             });
         else if(Variables::exists(token))
             return Variables::get_variable(token); //NOTE: evaluating and not evaluating an Int will do the same
@@ -162,9 +177,9 @@ std::shared_ptr<Value> Parser::parse_block(ParserStream &input) {
         return std::make_shared<OperationValue>(Operations::get_operation(token));
     else if (token == "[")
     {
-        Stack s;
+        auto s = std::make_shared<Stack>();
         while(input.peek_token() != "]")
-            s.push(parse_block(input));
+            s->push(parse_block(input));
         input.get_token();
         return std::make_shared<FunctionValue>(s);
     }

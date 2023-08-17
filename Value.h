@@ -7,8 +7,10 @@
 
 #include <string>
 #include <functional>
-#include "Stack.h"
+#include <stdexcept>
 #include "memory"
+
+class Stack;
 
 class Value : public std::enable_shared_from_this<Value>
 {
@@ -16,14 +18,18 @@ public:
     //virtual void pushToStack(Stack*) = 0;
     virtual std::string to_string() const = 0;
     virtual std::string print_string() const = 0;
-    virtual void eval(Stack* s) const;
+    virtual void eval(const std::shared_ptr<Stack>& s) const;
 
     template <class T>
     std::shared_ptr<T> as()
     {
         auto p = std::dynamic_pointer_cast<T>(this->shared_from_this());
         if(p == nullptr)
-            throw std::runtime_error("couldn't cast Value to type");
+            throw std::runtime_error("couldn't cast " +
+            this->print_string() +
+            " to type " +
+            (typeid(T).name() + 1)
+            );
         return p;
     }
 
@@ -65,32 +71,32 @@ private:
 class OperationValue: public Value // this is more like "primitive" functions
 {
 public:
-    explicit OperationValue(std::function<void(Stack *)> op);
+    explicit OperationValue(std::function<void(const std::shared_ptr<Stack>&)> op);
 
     std::string to_string() const override;
     std::string print_string() const override;
 
-    void eval(Stack* s) const override;
+    void eval(const std::shared_ptr<Stack>& s) const override;
 
 private:
     //void (*op)(Stack*);
-    std::function<void(Stack*)> op;
+    std::function<void(const std::shared_ptr<Stack>&)> op;
 };
+
 
 class FunctionValue: public Value
 {
 private:
-    Stack stack;
+    std::shared_ptr<Stack> stack;
 public:
-    explicit FunctionValue(const Stack& stack); // copy constructor
-    explicit FunctionValue(const std::function<void(Stack*)>& op);
+    explicit FunctionValue(const std::shared_ptr<Stack>&); // copy constructor
 
     std::string to_string() const override;
     std::string print_string() const override;
 
-    Stack get() const;
+    std::shared_ptr<Stack> get() const;
 
-    void eval(Stack* s) const override;
+    void eval(const std::shared_ptr<Stack>& s) const override;
 };
 
 template <typename T>

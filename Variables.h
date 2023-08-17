@@ -21,8 +21,8 @@ public:
     static bool exists(const std::string& name);
     static std::shared_ptr<Value> get_variable(const std::string& name);
     static void set_variable(const std::string& name, const std::shared_ptr<Value>& value);
-    static void push_variable(const std::string& name, Stack* s);
-    static void push_variable_no_eval(const std::string& name, Stack* s);
+    static void push_variable(const std::string& name, const std::shared_ptr<Stack>& s);
+    static void push_variable_no_eval(const std::string& name, const std::shared_ptr<Stack>& s);
 };
 
 #endif //GENSTACK_VARIABLES_H

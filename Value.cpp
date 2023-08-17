@@ -2,10 +2,11 @@
 // Created by migouche on 14/07/23.
 //
 
+#include <iostream>
 #include "Value.h"
 #include "Stack.h"
 
-void Value::eval(Stack *s) const {
+void Value::eval(const std::shared_ptr<Stack>& s) const {
     s->push(std::const_pointer_cast<Value>(this->shared_from_this()));
 }
 
@@ -27,33 +28,34 @@ std::string StringValue::get() const { return this->data; }
 
 
 
-OperationValue::OperationValue(std::function<void(Stack *)> op): op(std::move(op)) {}
+OperationValue::OperationValue(std::function<void(const std::shared_ptr<Stack>&)> op): op(std::move(op)) {}
 
 std::string OperationValue::to_string() const { return "operation"; }
 std::string OperationValue::print_string() const { return this->to_string(); }
 
-void OperationValue::eval(Stack *s) const { this->op(s); }
-
-
-FunctionValue::FunctionValue(const Stack &stack) {
-    this->stack = stack.copy();
+void OperationValue::eval(const std::shared_ptr<Stack>& s) const
+{
+    //std::cout << "evaluating\n";
+    this->op(s);
+    //std::cout << "evaluated\n";
 }
 
-FunctionValue::FunctionValue(const std::function<void(Stack *)>& op) {
-    this->stack = Stack();
-    this->stack.push(std::make_shared<OperationValue>([op](Stack* s){op(s); }));
+
+FunctionValue::FunctionValue(const std::shared_ptr<Stack>& stack) {
+    this->stack = stack->copy();
 }
+
 
 std::string FunctionValue::to_string() const { return "function"; }
 std::string FunctionValue::print_string() const { return "function"; }
 
-Stack FunctionValue::get() const { return this->stack; }
+std::shared_ptr<Stack> FunctionValue::get() const { return this->stack; }
 
-void FunctionValue::eval(Stack *s) const {
-    auto f = this->get();
-    while (f.length() > 0)
+void FunctionValue::eval(const std::shared_ptr<Stack>& s) const {
+    auto f = this->get()->copy();
+    while (f->length() > 0)
     {
-        auto v = f.pop();
+        auto v = f->pop_back();
         v->eval(s);
     }
 }

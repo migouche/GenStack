@@ -10,13 +10,15 @@
 #include <tuple>
 #include <string>
 #include <stdexcept>
-
-class Value;
+#include "Value.h"
 
 class Stack
 {
 private:
     std::list<std::shared_ptr<Value>> data;
+
+    void push_back(const std::shared_ptr<Value>& v);
+    std::shared_ptr<Value> pop_back();
 public:
     Stack();
 
@@ -26,7 +28,7 @@ public:
     std::shared_ptr<Value> pop();
     std::shared_ptr<Value> peek(); // for testing purposes
 
-    Stack copy() const;
+    std::shared_ptr<Stack> copy() const;
 
     void print() const;
 
@@ -37,16 +39,10 @@ public:
     {
         if (this->length() < sizeof...(T))
             throw std::runtime_error("Stack must have " + std::to_string(sizeof...(T)) + " elements at least");
-        return std::tuple<std::shared_ptr<T>...>{this->get_dynamic_pointer_cast<T>(this->pop())...};
+        return std::tuple<std::shared_ptr<T>...>{this->pop()->as<T>()...};
     }
 private:
-    template <typename T>
-    std::shared_ptr<T> get_dynamic_pointer_cast(const std::shared_ptr<Value>& v) {
-        auto ptr = std::dynamic_pointer_cast<T>(v);
-        if (ptr == nullptr)
-            throw std::runtime_error("Can't cast to the right type");
-        return ptr;
-    }
+    friend class FunctionValue;
 };
 
 #endif //GENSTACK_STACK_H

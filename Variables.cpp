@@ -5,6 +5,7 @@
 #include "Variables.h"
 #include "Value.h"
 #include "Stack.h"
+#include <iostream>
 
 std::map<std::string, std::shared_ptr<Value>> Variables::variables = {};
 
@@ -26,13 +27,14 @@ void Variables::set_variable(const std::string &name, const std::shared_ptr<Valu
         variables.insert({name, value});
 }
 
-void Variables::push_variable(const std::string &name, Stack *s) {
+void Variables::push_variable(const std::string &name, const std::shared_ptr<Stack>& s) {
     if (variables.find(name) == variables.end())
         throw std::runtime_error("Variable " + name + " not found");
+    std::cout << "got here\n";
     variables.at(name)->eval(s);
 }
 
-void Variables::push_variable_no_eval(const std::string &name, Stack *s) {
+void Variables::push_variable_no_eval(const std::string &name, const std::shared_ptr<Stack>& s) {
     if (variables.find(name) == variables.end())
         throw std::runtime_error("Variable " + name + " not found");
     auto v = variables.at(name);

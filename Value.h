@@ -8,7 +8,9 @@
 #include <string>
 #include <functional>
 #include <stdexcept>
+#include <list>
 #include "memory"
+#include "ParserStream.h"
 
 class Stack;
 
@@ -20,6 +22,8 @@ public:
     virtual std::string print_string() const = 0;
     virtual void eval(const std::shared_ptr<Stack>& s) const;
 
+    static std::shared_ptr<Value> parse(ParserStream& s);
+
     template <class T>
     std::shared_ptr<T> as()
     {
@@ -28,12 +32,13 @@ public:
             throw std::runtime_error("couldn't cast " +
             this->print_string() +
             " to type " +
-            (typeid(T).name() + 1)
+            (typeid(T).name() + 1) // FIXME: name() returns different stuff for different compilers, may or may not work
             );
         return p;
     }
 
     virtual ~Value() = default;
+    static std::list<std::function<std::tuple<bool, std::shared_ptr<Value>>(ParserStream&)>> parsers;
 };
 
 
@@ -48,6 +53,7 @@ public:
 
     int get() const;
 
+    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
 private:
     int data;
 };
@@ -61,9 +67,7 @@ public:
     std::string print_string() const override;
 
     std::string get() const;
-
-
-
+    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
 private:
     std::string data;
 };
@@ -78,6 +82,7 @@ public:
 
     void eval(const std::shared_ptr<Stack>& s) const override;
 
+    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
 private:
     //void (*op)(Stack*);
     std::function<void(const std::shared_ptr<Stack>&)> op;
@@ -97,6 +102,8 @@ public:
     std::shared_ptr<Stack> get() const;
 
     void eval(const std::shared_ptr<Stack>& s) const override;
+    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
+
 };
 
 template <typename T>

@@ -5,6 +5,100 @@
 #include <iostream>
 #include "Value.h"
 #include "Stack.h"
+#include "Operations.h"
+#include "Variables.h"
+
+std::shared_ptr<Value> Value::parse(ParserStream &s)
+{
+    for(auto op: Value::parsers)
+    {
+        auto [b, v] = op(s);
+        if(b)
+            return v;
+    }
+    throw std::runtime_error("Couldn't parse, peeked token: " + s.peek_token());
+}
+
+std::list<std::function<std::tuple<bool, std::shared_ptr<Value>>(ParserStream&)>> Value::parsers =
+        std::list<std::function<std::tuple<bool, std::shared_ptr<Value>>(ParserStream&)>>();
+// compiler wil complain if i write auto instead of the full type
+
+
+std::tuple<bool, std::shared_ptr<Value>> IntValue::try_parse(ParserStream &s) {
+    if(!(isdigit(s.peek_token()[0]) || (s.peek_token()[0] == '-' && s.peek_token().length() > 1))) // i'll use morgan later :V
+        return std::tuple(false, nullptr);
+    return std::tuple(true,
+                      std::make_shared<IntValue>(strtol(s.get_token().c_str(), nullptr, 10)));
+}
+
+std::tuple<bool, std::shared_ptr<Value>> StringValue::try_parse(ParserStream &s)
+{
+    if(s.peek_token()[0] != '"')
+        return std::tuple(false, nullptr);
+    auto str = s.get_token();
+    str.erase(str.begin());
+    if(str[str.length() - 1] == '"')
+        str.erase(str.end() - 1);
+    return std::tuple(true, std::make_shared<StringValue>(str));
+}
+
+std::tuple<bool, std::shared_ptr<Value>> OperationValue::try_parse(ParserStream &s)
+{
+    if(s.peek_token()[0] != '\'')
+        return std::tuple(false, nullptr);
+    auto str = s.get_token();
+    str.erase(str.begin());
+    if(!Operations::operation_exists(str))
+        return std::tuple(false, nullptr);
+    return std::tuple(true, std::make_shared<OperationValue>([str](const std::shared_ptr<Stack>& s){
+        s->push(std::make_shared<OperationValue>(Operations::get_operation(str)));}));
+}
+
+std::tuple<bool, std::shared_ptr<Value>> FunctionValue::try_parse(ParserStream &s)
+{
+    if(s.peek_token() != "[")
+        return std::tuple(false, nullptr);
+    s.get_token(); // consume the "["
+    auto stack = std::make_shared<Stack>();
+    while (s.peek_token() != "]")
+        stack->push(Value::parse(s));
+    s.get_token(); // consume the "]"
+    return std::tuple(true, std::make_shared<FunctionValue>(stack));
+}
+
+// hacky static initializer for auto-parser functions
+// (nameless namespace to make them "private")
+namespace
+{
+    std::tuple<bool, std::shared_ptr<Value>> try_operation(ParserStream &s)
+    {
+        if(!Operations::operation_exists(s.peek_token()))
+            return std::tuple(false, nullptr);
+        return std::tuple(true, std::make_shared<OperationValue>(
+                Operations::get_operation(s.get_token())));
+    }
+
+    std::tuple<bool, std::shared_ptr<Value>> try_variable(ParserStream &s)
+    {
+        auto str = s.peek_token();
+        if(str[0] == '\'')
+            str.erase(str.begin());
+        if(Variables::exists(str))
+        { // FIXME, may wanna try not evaling functions inside functions on next commit
+            s.get_token(); // consume it
+            return {true, Variables::get_variable(str)};
+        }
+        return std::tuple(false, nullptr);
+    }
+
+    bool _int_value = [](){ Value::parsers.emplace_front(IntValue::try_parse); return true; }();
+    bool _string_value = [](){ Value::parsers.emplace_front(StringValue::try_parse); return true; }();
+    bool _function_value = [](){ Value::parsers.emplace_front(FunctionValue::try_parse); return true; }();
+    bool _operation_value = [](){ Value::parsers.emplace_front(OperationValue::try_parse); return true; }();
+    bool _operation_try = [](){ Value::parsers.emplace_front(try_operation); return true; }();
+    bool _variable_try = [](){ Value::parsers.emplace_front(try_variable); return true; }();
+
+}
 
 void Value::eval(const std::shared_ptr<Stack>& s) const {
     s->push(std::const_pointer_cast<Value>(this->shared_from_this()));

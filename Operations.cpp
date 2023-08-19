@@ -64,7 +64,7 @@ void loop(const std::shared_ptr<Stack>&s)
 
     for(int i = 0; i < n->get(); i++)
     {
-        std::cout << "loop\n";
+        //std::cout << "loop\n";
         op->eval(s);
         //s->pop()->eval(s);
     }

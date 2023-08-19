@@ -28,15 +28,24 @@ Stack Parser::parse(const std::string &input)
 Stack  Parser::interactive_parse()
 { //REPL
     auto stack = std::make_shared<Stack>();
-    while(true) {
+    bool running = true;
+
+
+    Variables::set_variable("exit", std::make_shared<OperationValue>([&running](const std::shared_ptr<Stack>&){
+        running = false;
+    }));
+
+    while(running) {
         std::string line;
         std::getline(std::cin, line);
         // std::cout << "line: " << line << std::endl;
         std::istringstream iss(line);
         ParserStream stream(iss);
+
         new_parse(stream, stack);
         std::cout << "\n\n\n\n\n\n\n\n\n";
         stack->print();
+
     }
     return *stack->copy();
 

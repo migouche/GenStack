@@ -30,7 +30,6 @@ void Variables::set_variable(const std::string &name, const std::shared_ptr<Valu
 void Variables::push_variable(const std::string &name, const std::shared_ptr<Stack>& s) {
     if (variables.find(name) == variables.end())
         throw std::runtime_error("Variable " + name + " not found");
-    std::cout << "got here\n";
     variables.at(name)->eval(s);
 }
 

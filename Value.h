@@ -95,6 +95,7 @@ private:
     std::shared_ptr<Stack> stack;
 public:
     explicit FunctionValue(const std::shared_ptr<Stack>&); // copy constructor
+    explicit FunctionValue(const std::function<void(const std::shared_ptr<Stack>&)>& op); // constructor from operation (will create a stack with the operation in it)
 
     std::string to_string() const override;
     std::string print_string() const override;

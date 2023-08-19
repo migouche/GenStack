@@ -81,12 +81,20 @@ namespace
     std::tuple<bool, std::shared_ptr<Value>> try_variable(ParserStream &s)
     {
         auto str = s.peek_token();
+        bool eval = false;
         if(str[0] == '\'')
             str.erase(str.begin());
+        else
+            eval = true;
         if(Variables::exists(str))
-        { // FIXME, may wanna try not evaling functions inside functions on next commit
+        {
             s.get_token(); // consume it
-            return {true, Variables::get_variable(str)};
+            if(eval)
+                return {true, Variables::get_variable(str)};
+            else
+                return {true, std::make_shared<FunctionValue>([str](const std::shared_ptr<Stack>& s) {
+                    s->push(Variables::get_variable(str));
+                })};
         }
         return std::tuple(false, nullptr);
     }
@@ -139,6 +147,10 @@ FunctionValue::FunctionValue(const std::shared_ptr<Stack>& stack) {
     this->stack = stack->copy();
 }
 
+FunctionValue::FunctionValue(const std::function<void(const std::shared_ptr<Stack>&)>& op) {
+    this->stack = std::make_shared<Stack>();
+    this->stack->push(std::make_shared<OperationValue>(op));
+}
 
 std::string FunctionValue::to_string() const { return "function"; }
 std::string FunctionValue::print_string() const { return "function"; }

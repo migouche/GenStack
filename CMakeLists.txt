@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories(~/local/include) # this line may give errorsg
 
-add_executable(genstack main.cpp Value.h Operations.h Operations.cpp Stack.h Stack.cpp Value.cpp
+add_executable(genstack main.cpp Value.h Stack.h Stack.cpp Value.cpp
         Variables.cpp
         Variables.h
         Parser.cpp

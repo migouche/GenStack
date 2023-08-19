@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Value.h"
-#include "Operations.h"
 #include "Stack.h"
 #include "Parser.h"
 

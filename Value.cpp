@@ -5,7 +5,6 @@
 #include <iostream>
 #include "Value.h"
 #include "Stack.h"
-#include "Operations.h"
 #include "Variables.h"
 
 std::shared_ptr<Value> Value::parse(ParserStream &s)
@@ -42,17 +41,7 @@ std::tuple<bool, std::shared_ptr<Value>> StringValue::try_parse(ParserStream &s)
     return std::tuple(true, std::make_shared<StringValue>(str));
 }
 
-std::tuple<bool, std::shared_ptr<Value>> OperationValue::try_parse(ParserStream &s)
-{
-    if(s.peek_token()[0] != '\'')
-        return std::tuple(false, nullptr);
-    auto str = s.get_token();
-    str.erase(str.begin());
-    if(!Operations::operation_exists(str))
-        return std::tuple(false, nullptr);
-    return std::tuple(true, std::make_shared<OperationValue>([str](const std::shared_ptr<Stack>& s){
-        s->push(std::make_shared<OperationValue>(Operations::get_operation(str)));}));
-}
+
 
 std::tuple<bool, std::shared_ptr<Value>> FunctionValue::try_parse(ParserStream &s)
 {
@@ -70,14 +59,6 @@ std::tuple<bool, std::shared_ptr<Value>> FunctionValue::try_parse(ParserStream &
 // (nameless namespace to make them "private")
 namespace
 {
-    std::tuple<bool, std::shared_ptr<Value>> try_operation(ParserStream &s)
-    {
-        if(!Operations::operation_exists(s.peek_token()))
-            return std::tuple(false, nullptr);
-        return std::tuple(true, std::make_shared<OperationValue>(
-                Operations::get_operation(s.get_token())));
-    }
-
     std::tuple<bool, std::shared_ptr<Value>> try_variable(ParserStream &s)
     {
         auto str = s.peek_token();
@@ -102,8 +83,8 @@ namespace
     bool _int_value = [](){ Value::parsers.emplace_front(IntValue::try_parse); return true; }();
     bool _string_value = [](){ Value::parsers.emplace_front(StringValue::try_parse); return true; }();
     bool _function_value = [](){ Value::parsers.emplace_front(FunctionValue::try_parse); return true; }();
-    bool _operation_value = [](){ Value::parsers.emplace_front(OperationValue::try_parse); return true; }();
-    bool _operation_try = [](){ Value::parsers.emplace_front(try_operation); return true; }();
+    //bool _operation_value = [](){ Value::parsers.emplace_front(OperationValue::try_parse); return true; }();
+    //bool _operation_try = [](){ Value::parsers.emplace_front(try_operation); return true; }();
     bool _variable_try = [](){ Value::parsers.emplace_front(try_variable); return true; }();
 
 }

@@ -15,7 +15,7 @@ class Stack;
 
 class Variables {
 private:
-    static std::map<std::string, std::shared_ptr<Value>> variables;
+    static std::map<std::string, std::shared_ptr<Value>> &variables();
 
 public:
     static bool exists(const std::string& name);

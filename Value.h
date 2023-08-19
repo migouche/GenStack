@@ -82,7 +82,7 @@ public:
 
     void eval(const std::shared_ptr<Stack>& s) const override;
 
-    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
+    [[maybe_unused]] [[maybe_unused]] static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
 private:
     //void (*op)(Stack*);
     std::function<void(const std::shared_ptr<Stack>&)> op;

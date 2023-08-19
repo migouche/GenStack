@@ -6,7 +6,6 @@
 
 #include "Stack.h"
 #include "Value.h"
-#include "Operations.h"
 #include "Variables.h"
 
 #include <memory>
@@ -55,18 +54,15 @@ Stack  Parser::interactive_parse()
 void Parser::new_parse(ParserStream &input, const std::shared_ptr<Stack>& stack) {
     while(!input.is_end_of_stream())
     {
-        if(Operations::operation_exists(input.peek_token()))
-            Operations::get_operation(input.get_token())(stack);
-        else if (Variables::exists(input.peek_token()))
+
+        if (Variables::exists(input.peek_token()))
             Variables::push_variable(input.get_token(), stack);
             //std::cout << "variable pushed\n";
         else if(input.peek_token()[0] == '\'')
         {
             auto token = input.get_token();
             token.erase(token.begin());
-            if (Operations::operation_exists(token))
-                stack->push(std::make_shared<OperationValue>(Operations::get_operation(token)));
-            else if (Variables::exists(token))
+            if (Variables::exists(token))
                 Variables::push_variable_no_eval(token, stack);
             else
                 throw std::runtime_error("Unknown operation or variable: " + token);

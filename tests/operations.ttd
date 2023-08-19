@@ -128,3 +128,12 @@ define_test(operations,
     check(stack.pop()->as<IntValue>()->get())_equal(12);
     check(stack.length())_equal(0);
 }
+
+define_test(operations,
+            "not evaluating a function inside another")
+{
+    declare(Stack stack);
+    perform(stack = Parser::parse("[ 3 + ] \"func store [ 2 'func ] eval eval"));
+    check(stack.pop()->as<IntValue>()->get())_equal(5);
+    check(stack.length())_equal(0);
+}

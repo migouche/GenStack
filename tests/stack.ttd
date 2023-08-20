@@ -2,6 +2,8 @@
 #include "../Value.h"
 #include "../Stack.h"
 #include "../Parser.h"
+#include "../testudo.dcl"
+
 
 define_top_test_node("pile", // parent full name
                      (stack, // test name
@@ -11,7 +13,7 @@ define_test(stack, // parent
             "pushing and popping") { // title
   declare(using namespace std);
   declare(Stack stack);
-  check(stack.length())_equal(0);
+  check_empty_stack(stack);
   perform(stack.push(make_shared<IntValue>(0)));
   check(stack.length())_equal(1);
   perform(stack.push(make_shared<IntValue>(0)));
@@ -19,7 +21,7 @@ define_test(stack, // parent
   perform(stack.pop());
   check(stack.length())_equal(1);
   perform(stack.pop());
-  check(stack.length())_equal(0);
+  check_empty_stack(stack);
 }
 
 define_test(stack, // parent
@@ -46,5 +48,5 @@ define_test(stack,
     perform(stack = Parser::parse("\"hey \"ho\""));
     check(stack.pop()->as<StringValue>()->get())_equal("ho");
     check(stack.pop()->as<StringValue>()->get())_equal("hey");
-    check(stack.length())_equal(0);
+    check_empty_stack(stack);
 }

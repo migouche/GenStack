@@ -12,4 +12,7 @@ add_executable(genstack main.cpp Value.h Stack.h Stack.cpp Value.cpp
         Parser.cpp
         Parser.h
         ParserStream.cpp
-        ParserStream.h)
+        ParserStream.h
+        Stack.dcl
+        FunctionContent.cpp
+        FunctionContent.h)

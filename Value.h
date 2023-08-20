@@ -11,16 +11,15 @@
 #include <list>
 #include "memory"
 #include "ParserStream.h"
+#include "Stack.dcl"
 
-class Stack;
+class FunctionContent;
 
 class Value : public std::enable_shared_from_this<Value>
 {
 public:
-    //virtual void pushToStack(Stack*) = 0;
-    virtual std::string to_string() const = 0;
     virtual std::string print_string() const = 0;
-    virtual void eval(const std::shared_ptr<Stack>& s) const;
+    virtual void eval(crp_Stack  s) const;
 
     static std::shared_ptr<Value> parse(ParserStream& s);
 
@@ -32,7 +31,7 @@ public:
             throw std::runtime_error("couldn't cast " +
             this->print_string() +
             " to type " +
-            (typeid(T).name() + 1) // FIXME: name() returns different stuff for different compilers, may or may not work
+            (typeid(T).name() + 1) // NOTE: name() returns different stuff for different compilers, may or may not work
             );
         return p;
     }
@@ -47,7 +46,6 @@ class IntValue: public Value
 public:
     explicit IntValue(int i);
 
-    std::string to_string() const override;
     std::string print_string() const override;
 
 
@@ -58,12 +56,12 @@ private:
     int data;
 };
 
+
 class StringValue: public Value
 {
 public:
     explicit StringValue(std::string  s);
 
-    std::string to_string() const override;
     std::string print_string() const override;
 
     std::string get() const;
@@ -72,39 +70,81 @@ private:
     std::string data;
 };
 
-class OperationValue: public Value // this is more like "primitive" functions
+
+class BoolValue: public Value
 {
 public:
-    explicit OperationValue(std::function<void(const std::shared_ptr<Stack>&)> op);
+    explicit BoolValue(bool b);
 
-    std::string to_string() const override;
     std::string print_string() const override;
 
-    void eval(const std::shared_ptr<Stack>& s) const override;
-
-    [[maybe_unused]] [[maybe_unused]] static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
+    bool get() const;
+    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
 private:
-    //void (*op)(Stack*);
-    std::function<void(const std::shared_ptr<Stack>&)> op;
+    bool data;
+};
+
+
+class OperationValue: public Value // OperationValues point to a c++ function
+{
+public:
+    explicit OperationValue(std::function<void(crp_Stack )> op);
+
+    std::string print_string() const override;
+
+    void eval(crp_Stack  s) const override;
+private:
+    std::function<void(crp_Stack )> op;
 };
 
 
 class FunctionValue: public Value
 {
 private:
-    std::shared_ptr<Stack> stack;
+    std::shared_ptr<FunctionContent> content;
 public:
-    explicit FunctionValue(const std::shared_ptr<Stack>&); // copy constructor
-    explicit FunctionValue(const std::function<void(const std::shared_ptr<Stack>&)>& op); // constructor from operation (will create a stack with the operation in it)
+    explicit FunctionValue(const std::shared_ptr<FunctionContent>&);
 
-    std::string to_string() const override;
     std::string print_string() const override;
 
-    std::shared_ptr<Stack> get() const;
+    std::shared_ptr<FunctionContent> get() const;
 
-    void eval(const std::shared_ptr<Stack>& s) const override;
+    void eval(crp_Stack  s) const override;
+    //static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
+
+};
+
+class IdentifierValue: public Value
+{
+private:
+    std::string name;
+public:
+    explicit IdentifierValue(std::string name);
+
+    std::string print_string() const override;
+
+    std::string get() const;
+
+    void eval(crp_Stack  s) const override;
+    static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
+};
+
+
+class LambdaValue: public Value
+{
+private:
+    std::shared_ptr<FunctionContent> content;
+public:
+    LambdaValue();
+
+    std::string print_string() const override;
+
+    std::shared_ptr<FunctionContent> get() const;
+
+    void eval(crp_Stack  s) const override;
     static std::tuple<bool, std::shared_ptr<Value>> try_parse(ParserStream& s);
 
+    void add_value(const std::shared_ptr<Value>& v);
 };
 
 template <typename T>

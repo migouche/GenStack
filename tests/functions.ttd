@@ -1,0 +1,39 @@
+#include <testudo/testudo_lc>
+#include "../Stack.h"
+#include "../Parser.h"
+#include "../testudo.dcl"
+
+define_top_test_node("functions", (functions,
+                     "tests around FunctionValue and operations using them"));
+
+define_test(functions, "if(true)")
+{
+    declare(Stack stack = Parser::parse("true [ 4 ] if"));
+    check(stack.pop()->as<IntValue>()->get())_equal(4);
+    check_empty_stack(stack);
+}
+
+define_test(functions, "if(false)")
+{
+    declare(Stack stack = Parser::parse("false [ 4 ] if"));
+    check_empty_stack(stack);
+}
+
+define_test(functions, "if(true) else")
+{
+    declare(Stack stack = Parser::parse("true [ 4 ] [ 5 ] if_else"));
+    check(stack.pop()->as<IntValue>()->get())_equal(4);
+    check_empty_stack(stack);
+}
+
+define_test(functions, "if(false) else")
+{
+    declare(Stack stack = Parser::parse("false [ 4 ] [ 5 ] if_else"));
+    check(stack.pop()->as<IntValue>()->get())_equal(5);
+    check_empty_stack(stack);
+}
+
+define_test(functions, "nesting functions")
+{
+    declare(Stack stack = Parser::parse("[ [ 4 ] ] eval eval"))
+}

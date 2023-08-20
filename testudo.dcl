@@ -1,0 +1,1 @@
+#define check_empty_stack(stack) check(stack.length())_equal(0)

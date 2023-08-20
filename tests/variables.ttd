@@ -1,0 +1,20 @@
+#include "testudo/testudo_lc"
+#include "../Stack.h"
+#include "../Parser.h"
+#include "../testudo.dcl"
+
+define_top_test_node("variables", (variables, "variable tests"));
+
+define_test(variables, "evaluating functions with variables")
+{
+    declare(Stack stack = Parser::parse("4 \"var store [ var ] eval"));
+    check(stack.pop()->as<IntValue>()->get())_equal(4);
+    check_empty_stack(stack);
+}
+
+define_test(variables, "changing name variable and evaluating")
+{
+    declare(Stack stack = Parser::parse("4 \"var store [ var ] \"hoi \"var store eval"));
+    check(stack.pop()->as<StringValue>()->get())_equal("hoi");
+    check_empty_stack(stack);
+}

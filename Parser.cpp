@@ -30,7 +30,7 @@ Stack  Parser::interactive_parse()
     bool running = true;
 
 
-    Variables::set_variable("exit", std::make_shared<OperationValue>([&running](const std::shared_ptr<Stack>&){
+    Variables::set_variable("exit", std::make_shared<OperationValue>([&running](crp_Stack ){
         running = false;
     }));
 
@@ -51,7 +51,7 @@ Stack  Parser::interactive_parse()
 }
 
 
-void Parser::new_parse(ParserStream &input, const std::shared_ptr<Stack>& stack) {
+void Parser::new_parse(ParserStream &input, crp_Stack  stack) {
     while(!input.is_end_of_stream())
     {
 
@@ -68,6 +68,6 @@ void Parser::new_parse(ParserStream &input, const std::shared_ptr<Stack>& stack)
                 throw std::runtime_error("Unknown operation or variable: " + token);
         }
         else
-            stack->push(Value::parse(input));
+            Value::parse(input)->eval(stack);
     }
 }

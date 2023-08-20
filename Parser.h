@@ -8,6 +8,7 @@
 #include <istream>
 #include <memory>
 #include "ParserStream.h"
+#include "Stack.dcl"
 
 class Stack;
 class Value;
@@ -18,10 +19,8 @@ public:
     //static Stack parse(std::istream& input, bool print = true);
     static Stack parse(const std::string& input);
 
-    static void new_parse(ParserStream& input, const std::shared_ptr<Stack>& stack);
+    static void new_parse(ParserStream& input, crp_Stack  stack);
     static Stack  interactive_parse(); // will use cin
-
-    static std::shared_ptr<Value> parse_block(ParserStream& input);
 };
 
 #endif //GENSTACK_PARSER_H

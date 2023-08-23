@@ -112,6 +112,11 @@ i-check_equal [c2f2a3d493be1908]
 [tests/functions.ttd:168] c-with_summary [835cb8d4ab2569f2] r-10-0-0
 i-end_with
 t-produce_summary [5d5580e3ae1e5fa4]
+t-title [6c805e86c69a2e81]
+i-declare [93ab84a2747737c9]
+[tests/functions.ttd:175] c-check_equal [09bd09394d3aa198] r-1-0-0
+[tests/functions.ttd:176] c-check_equal [87e78edc5ad64b48] r-1-0-0
+t-produce_summary [b7ac026dad3544b1]
 t-produce_summary [1bfc51ba5d67c37e]
 t-produce_summary [47605f56f678d083]
 t-title [c85b90af3cf54a93]

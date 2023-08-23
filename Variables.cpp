@@ -100,14 +100,6 @@ void loop(crp_Stack s)
         op->eval(s);
 }
 
-void if_no_else(crp_Stack  s)
-{
-    auto [f,b] = s->get<FunctionValue, BoolValue>();
-    // order is reversed because it pops normally from the stack
-    if(b->get())
-        f->eval(s);
-}
-
 void dup(crp_Stack s)
 {
     s->push(s->peek());
@@ -160,12 +152,23 @@ void while_loop(crp_Stack s)
     }
 }
 
+
+void if_no_else(crp_Stack  s)
+{
+    auto [f,b] = s->get<FunctionValue, Value>();
+    // order is reversed because it pops normally from the stack
+    b->eval(s);
+    if(s->pop()->as<BoolValue>()->get())
+        f->eval(s);
+}
+
 void if_else(crp_Stack s)
 {
     auto [f2 /* else */, f1 /* if */, b] =
-            s->get<FunctionValue, FunctionValue, BoolValue>();
+            s->get<FunctionValue, FunctionValue, Value>();
     // we first pop the "else func", then the "if func" and then the bool
-    if(b->get())
+    b->eval(s);
+    if(s->pop()->as<BoolValue>()->get())
         f1->eval(s);
     else
         f2->eval(s);

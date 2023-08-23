@@ -60,11 +60,12 @@ std::tuple<bool, std::shared_ptr<Value>> LambdaValue::try_parse(ParserStream &s)
 // (nameless namespace to make them "private")
 namespace
 {
+    bool _identifier_try = [](){ Value::parsers.emplace_front(IdentifierValue::try_parse); return true; }();
+    // VERY IMPORTANT FOR IDENTIFIERS TO BE THE LAST IN THE LIST
     bool _int_value = [](){ Value::parsers.emplace_front(IntValue::try_parse); return true; }();
     bool _string_value = [](){ Value::parsers.emplace_front(StringValue::try_parse); return true; }();
     bool _lambdaCalue = [](){ Value::parsers.emplace_front(LambdaValue::try_parse); return true; }();
     bool _bool_try = [](){ Value::parsers.emplace_front(BoolValue::try_parse); return true; }();
-    bool _identifier_try = [](){ Value::parsers.emplace_front(IdentifierValue::try_parse); return true; }();
 }
 
 void Value::eval(crp_Stack  s) const {
@@ -142,8 +143,13 @@ void IdentifierValue::eval(crp_Stack s) const {
     Variables::get_variable(this->name)->eval(s);
 }
 
+std::list<char> special_characters = {'[', ']', '(', ')', '{', '}', '"', '\''};
+
+
 std::tuple<bool, std::shared_ptr<Value>> IdentifierValue::try_parse(ParserStream &s) {
-    if (Variables::exists(s.peek_token())) {
+    if (!isdigit(s.peek_token()[0]) && !std::any_of(special_characters.begin(), special_characters.end(),
+                                                     [&s](char c) { return s.peek_token()[0] == c; }))
+    {
         auto name = s.get_token();
         return {true, std::make_shared<IdentifierValue>(name)};
     }

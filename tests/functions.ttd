@@ -168,3 +168,10 @@ define_test(functions, "while")
     with_data(s, l)
         check(s->get())_equal(1);
 }
+
+define_test(functions, "recursive function")
+{
+    declare(Stack stack = Parser::parse("[ [ 10 num > ] [ num 1 + \"num store func ] if ] \"func store 0 \"num store func num"));
+    check(stack.pop()->as<IntValue>()->get())_equal(10);
+    check_empty_stack(stack);
+}

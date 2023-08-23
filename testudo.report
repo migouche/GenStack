@@ -1,7 +1,7 @@
 <testudo>
-  <test location="" name="/" title="" n_failed="0" n_total="105" n_errors="0" success="true">
-    <test location="" name="functions" title="" n_failed="0" n_total="50" n_errors="0" success="true">
-      <test location="" name="functions.functions" title="tests around FunctionValue and operations using them" n_failed="0" n_total="50" n_errors="0" success="true">
+  <test location="" name="/" title="" n_failed="0" n_total="107" n_errors="0" success="true">
+    <test location="" name="functions" title="" n_failed="0" n_total="52" n_errors="0" success="true">
+      <test location="" name="functions.functions" title="tests around FunctionValue and operations using them" n_failed="0" n_total="52" n_errors="0" success="true">
         <test location="" name="functions.functions.if(true)" title="if(true)" n_failed="0" n_total="2" n_errors="0" success="true">
           <declare location="" brief_location="">Stack stack = Parser::parse(&quot;true [ 4 ] if&quot;)</declare>
           <check_equal location="" brief_location="" success="true" prefix="">
@@ -218,6 +218,17 @@
               <expression2 value="">1</expression2>
             </check_equal>
           </with>
+        </test>
+        <test location="" name="functions.functions.recursive function" title="recursive function" n_failed="0" n_total="2" n_errors="0" success="true">
+          <declare location="" brief_location="">Stack stack = Parser::parse(&quot;[ [ 10 num &gt; ] [ num 1 + \&quot;num store func ] if ] \&quot;func store 0 \&quot;num store func num&quot;)</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="10">stack.pop()-&gt;as&lt;IntValue&gt;()-&gt;get()</expression1>
+            <expression2 value="10">10</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="0">stack.length()</expression1>
+            <expression2 value="0">0</expression2>
+          </check_equal>
         </test>
       </test>
     </test>

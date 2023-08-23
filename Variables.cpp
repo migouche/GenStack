@@ -113,6 +113,52 @@ void dup(crp_Stack s)
     s->push(s->peek());
 }
 
+void eq(crp_Stack s)
+{
+    auto [v1, v2] = s->get<IntValue, IntValue>();
+    s->push(std::make_shared<BoolValue>(v1->get() == v2->get()));
+}
+
+void neq(crp_Stack s)
+{
+    auto [v1, v2] = s->get<IntValue, IntValue>();
+    s->push(std::make_shared<BoolValue>(v1->get() != v2->get()));
+}
+
+void gt(crp_Stack s)
+{
+    auto [v1, v2] = s->get<IntValue, IntValue>();
+    s->push(std::make_shared<BoolValue>(v2->get() > v1->get()));
+}
+
+void lt(crp_Stack s)
+{
+    auto [v1, v2] = s->get<IntValue, IntValue>();
+    s->push(std::make_shared<BoolValue>(v2->get() < v1->get()));
+}
+
+void gte(crp_Stack s)
+{
+    auto [v1, v2] = s->get<IntValue, IntValue>();
+    s->push(std::make_shared<BoolValue>(v2->get() >= v1->get()));
+}
+
+void lte(crp_Stack s)
+{
+    auto [v1, v2] = s->get<IntValue, IntValue>();
+    s->push(std::make_shared<BoolValue>(v2->get() <= v1->get()));
+}
+
+void while_loop(crp_Stack s)
+{
+    auto [func, cond] = s->get<FunctionValue, FunctionValue>();
+    cond->eval(s);
+    while(s->pop()->as<BoolValue>()->get())
+    {
+        func->eval(s);
+        cond->eval(s);
+    }
+}
 
 void if_else(crp_Stack s)
 {
@@ -140,7 +186,13 @@ namespace
         Variables::set_variable("if", std::make_shared<OperationValue>(if_no_else));
         Variables::set_variable("if_else", std::make_shared<OperationValue>(if_else));
         Variables::set_variable("dup", std::make_shared<OperationValue>(dup));
-        // TODO: make all functions have a reference to the big stack for duping
+        Variables::set_variable("==", std::make_shared<OperationValue>(eq));
+        Variables::set_variable("!=", std::make_shared<OperationValue>(neq));
+        Variables::set_variable(">", std::make_shared<OperationValue>(gt));
+        Variables::set_variable("<", std::make_shared<OperationValue>(lt));
+        Variables::set_variable(">=", std::make_shared<OperationValue>(gte));
+        Variables::set_variable("<=", std::make_shared<OperationValue>(lte));
+        Variables::set_variable("while", std::make_shared<OperationValue>(while_loop));
 
         return true;
     }();

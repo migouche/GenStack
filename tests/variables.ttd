@@ -18,3 +18,10 @@ define_test(variables, "changing name variable and evaluating")
     check(stack.pop()->as<StringValue>()->get())_equal("hoi");
     check_empty_stack(stack);
 }
+
+define_test(variables, "changing variable inside function")
+{
+    declare(Stack stack = Parser::parse(" [ 5 \"var store ] eval var"));
+    check(stack.pop()->as<IntValue>()->get())_equal(5);
+    check_empty_stack(stack);
+}

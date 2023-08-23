@@ -6,6 +6,15 @@
 define_top_test_node("functions", (functions,
                      "tests around FunctionValue and operations using them"));
 
+template<typename T>
+std::list<std::shared_ptr<T>> stack_to_list(Stack s)
+{
+    std::list<std::shared_ptr<T>> l;
+    while (s.length() > 0)
+        l.push_front(s.pop()->as<T>());
+    return l;
+}
+
 define_test(functions, "if(true)")
 {
     declare(Stack stack = Parser::parse("true [ 4 ] if"));
@@ -35,5 +44,127 @@ define_test(functions, "if(false) else")
 
 define_test(functions, "nesting functions")
 {
-    declare(Stack stack = Parser::parse("[ [ 4 ] ] eval eval"))
+    declare(Stack stack = Parser::parse("[ [ 4 ] ] eval eval"));
+}
+
+define_test(functions, "== true")
+{
+    declare(Stack stack = Parser::parse("4 4 =="));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "== false")
+{
+    declare(Stack stack = Parser::parse("4 5 =="));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "!= true")
+{
+    declare(Stack stack = Parser::parse("4 5 !="));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "!= false")
+{
+    declare(Stack stack = Parser::parse("4 4 !="));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "> true")
+{
+    declare(Stack stack = Parser::parse("5 4 >"));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "> eq false")
+{
+    declare(Stack stack = Parser::parse("4 4 >"));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "> false")
+{
+    declare(Stack stack = Parser::parse("4 5 >"));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "< true")
+{
+    declare(Stack stack = Parser::parse("4 5 <"));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "< eq false")
+{
+    declare(Stack stack = Parser::parse("4 4 <"));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "< false")
+{
+    declare(Stack stack = Parser::parse("5 4 <"));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, ">= true")
+{
+    declare(Stack stack = Parser::parse("5 4 >="));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, ">= eq true")
+{
+    declare(Stack stack = Parser::parse("4 4 >="));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, ">= false")
+{
+    declare(Stack stack = Parser::parse("4 5 >="));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "<= true")
+{
+    declare(Stack stack = Parser::parse("4 5 <="));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "<= eq true")
+{
+    declare(Stack stack = Parser::parse("4 4 <="));
+    check(stack.pop()->as<BoolValue>()->get())_true;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "<= false")
+{
+    declare(Stack stack = Parser::parse("5 4 <="));
+    check(stack.pop()->as<BoolValue>()->get())_false;
+    check_empty_stack(stack);
+}
+
+define_test(functions, "while")
+{
+    declare(Stack stack = Parser::parse("0 \"num\" store [ num 10 < ] [ num 1 + \"num\" store 1 ] while"));
+    declare(auto l = stack_to_list<IntValue>(stack));
+    check(l.size())_equal(10);
+
+    with_data(s, l)
+        check(s->get())_equal(1);
 }

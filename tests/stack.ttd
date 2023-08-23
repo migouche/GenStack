@@ -2,7 +2,7 @@
 #include "../Value.h"
 #include "../Stack.h"
 #include "../Parser.h"
-#include "../testudo.dcl"
+#include "testudo.dcl"
 
 
 define_top_test_node("pile", // parent full name

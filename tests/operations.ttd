@@ -1,7 +1,7 @@
 #include <testudo/testudo_lc> // default lower-case style
 #include "../Stack.h"
 #include "../Parser.h"
-#include "../testudo.dcl"
+#include "testudo.dcl"
 
 define_top_test_node("operations",
                      (operations,

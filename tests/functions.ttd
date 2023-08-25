@@ -171,7 +171,17 @@ define_test(functions, "while")
 
 define_test(functions, "recursive function")
 {
-    declare(Stack stack = Parser::parse("[ [ 10 num > ] [ num 1 + \"num store func ] if ] \"func store 0 \"num store func num"));
+    declare(Stack stack = Parser::parse(
+            "[ [ 10 num > ] [ num 1 + \"num store func ] if ] \"func store 0 \"num store func num"));
     check(stack.pop()->as<IntValue>()->get())_equal(10);
     check_empty_stack(stack);
 }
+
+/*define_test(functions, "recursive factorial")
+{
+    declare(Stack stack = Parser::parse( // two vars: num and result
+            "[ [ num 1 <= ] [ 1 result *] [ num num 1 - * result * \"result store num 1 - \"num store fact ] if_else ] \"fact store 5 \"num store 1 \"result store fact"
+            ));
+    check(stack.pop()->as<IntValue>()->get())_equal(120);
+    check_empty_stack(stack);
+}*/

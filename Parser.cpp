@@ -47,7 +47,6 @@ Stack  Parser::interactive_parse()
 
     }
     return *stack->copy();
-
 }
 
 

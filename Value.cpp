@@ -25,7 +25,7 @@ std::list<std::function<std::tuple<bool, std::shared_ptr<Value>>(ParserStream&)>
 
 
 std::tuple<bool, std::shared_ptr<Value>> IntValue::try_parse(ParserStream &s) {
-    if(!(isdigit(s.peek_token()[0]) || (s.peek_token()[0] == '-' && s.peek_token().length() > 1))) // i'll use morgan later :V
+    if(!isdigit(s.peek_token()[0]) && (s.peek_token()[0] != '-' || s.peek_token().length() == 1))
         return std::tuple(false, nullptr);
     return std::tuple(true,
                       std::make_shared<IntValue>(strtol(s.get_token().c_str(), nullptr, 10)));
